@@ -34,6 +34,7 @@
                 'branch' : '',
                 'path' : '',
                 'param' : '',
+                'permissions' : '',
                 'collapsed' : false
             });
             $(html).insertBefore($(this));
@@ -102,6 +103,10 @@
                 		$(currentField).find('label').attr('for', 'pathRegex-' + index);
                 		$(currentField).find('input').attr('id', 'pathRegex-' + index).attr('name', 'pathRegex-' + index);
                 	}
+                	if (index2 === 8) {
+                        $(currentField).find('label').attr('for', 'restrictAccess-' + index);
+                        $(currentField).find('input').attr('id', 'restrictAccess-' + index).attr('name', 'restrictAccess-' + index);
+                    }
             	});
             });
         });
@@ -149,10 +154,13 @@
         $(document).on('click', '.manual', function(e) {
             e.preventDefault();
             var classes = $(this).find('span').attr('class');
+            var id = $(this).parent().parent().get(0).id.replace("job-", "");
             if (classes.indexOf("aui-lozenge-success") > -1) {
             	updateTrigger($(this).parent().parent(), "manual;", false);
+                $(this).parent().parent().find('#restrictAccess-' + id).parent().addClass('hide-permissions');
             } else {
             	updateTrigger($(this).parent().parent(), "manual;", true);
+            	$(this).parent().parent().find('#restrictAccess-' + id).parent().removeClass('hide-permissions');
             }
             $(this).find('span').toggleClass("aui-lozenge-success");
         });
