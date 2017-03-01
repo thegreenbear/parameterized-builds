@@ -26,6 +26,7 @@ public class SettingsService {
 	public static final String PARAM_PREFIX = "buildParameters-";
 	public static final String BRANCH_PREFIX = "branchRegex-";
 	public static final String PATH_PREFIX = "pathRegex-";
+	public static final String PERMISSIONS_PREFIX = "restrictAccess-";
 
 	private RepositoryHookService hookService;
 	private SecurityService securityService;
@@ -96,6 +97,8 @@ public class SettingsService {
 						.branchRegex(parameterMap
 								.get(entry.getKey().replace(JOB_PREFIX, BRANCH_PREFIX)).toString())
 						.pathRegex(parameterMap.get(entry.getKey().replace(JOB_PREFIX, PATH_PREFIX))
+								.toString())
+						.permissions(parameterMap.get(entry.getKey().replace(JOB_PREFIX, PERMISSIONS_PREFIX))
 								.toString())
 						.build();
 

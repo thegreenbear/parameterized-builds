@@ -178,12 +178,23 @@
         		hide-permissions
         	{/if}
         {/let}
-	    {call aui.form.textField}
+	    {call aui.form.selectField}
         	{param id: 'restrictAccess-' + $count /}
         	{param value: $restrictAccess /}
         	{param labelContent: 'Restrict Access' /}
-        	{param extraClass: 'long-field' /}
-            {param fieldWidth: 'full-width' /}
+            {param options: [[
+                    'text': 'Any',
+                    'value': 'None'
+                ],[
+                    'text': 'Read',
+                    'value': 'REPO_READ'
+                ],[
+                    'text': 'Write',
+                    'value': 'REPO_WRITE'
+                ],[
+                    'text': 'Admin',
+                    'value': 'REPO_ADMIN'
+                ]] /}
         	{param descriptionText: 'Prevent users without given repository permission to trigger this job.' /}
             {param extraClasses: $permissionsClasses /}
         {/call}

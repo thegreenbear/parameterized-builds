@@ -29,6 +29,7 @@ import com.atlassian.bitbucket.server.ApplicationPropertiesService;
 import com.atlassian.bitbucket.setting.Settings;
 import com.atlassian.bitbucket.user.ApplicationUser;
 import com.kylenicholls.stash.parameterizedbuilds.ciserver.Jenkins;
+import com.kylenicholls.stash.parameterizedbuilds.conditions.BuildPermissionsCondition;
 import com.kylenicholls.stash.parameterizedbuilds.helper.SettingsService;
 import com.kylenicholls.stash.parameterizedbuilds.item.JenkinsResponse;
 import com.kylenicholls.stash.parameterizedbuilds.item.Job;
@@ -48,6 +49,7 @@ public class BuildResourceTest {
 	private SettingsService settingsService;
 	private ApplicationPropertiesService propertiesService;
 	private PullRequestService prService;
+	private BuildPermissionsCondition permissionsCheck;
 	private Settings settings;
 	private UriInfo uriInfo;
 	private ApplicationUser user;
@@ -62,7 +64,8 @@ public class BuildResourceTest {
 		authContext = mock(AuthenticationContext.class);
 		propertiesService = mock(ApplicationPropertiesService.class);
 		prService = mock(PullRequestService.class);
-		rest = new BuildResource(i18nService, settingsService, jenkins, propertiesService, prService, authContext);
+		permissionsCheck = mock(BuildPermissionsCondition.class);
+		rest = new BuildResource(i18nService, settingsService, jenkins, propertiesService, prService, authContext, permissionsCheck);
 
 		repository = mock(Repository.class);
 		settings = mock(Settings.class);
@@ -77,6 +80,7 @@ public class BuildResourceTest {
 		when(repository.getSlug()).thenReturn(REPO_SLUG);
 		when(project.getKey()).thenReturn(PROJECT_KEY);
 		when(propertiesService.getBaseUrl()).thenReturn(new URI(URI));
+		when(permissionsCheck.checkPermissions(any(), any(), any())).thenReturn(true);
 
 		jobs = new ArrayList<>();
 		when(settingsService.getJobs(any())).thenReturn(jobs);
@@ -163,7 +167,8 @@ public class BuildResourceTest {
 		String title = "prtitle";
 		String description = "prdescription";
 		Job job = new Job.JobBuilder(1).jobName(jobName).triggers(new String[] { "manual" })
-				.buildParameters("param1=$BRANCH\r\nparam2=$PRDESTINATION\r\nparam3=$PRURL\r\nparam4=$PRAUTHOR\r\nparam5=$PRTITLE\r\nparam6=$PRDESCRIPTION\r\nparam7=$PRID").build();
+				.buildParameters("param1=$BRANCH\r\nparam2=$PRDESTINATION\r\nparam3=$PRURL\r\nparam4=$PRAUTHOR\r\n" +
+						"param5=$PRTITLE\r\nparam6=$PRDESCRIPTION\r\nparam7=$PRID").permissions("REPO_ADMIN").build();
 		jobs.add(job);
 		PullRequest pr = mock(PullRequest.class);
 		PullRequestParticipant author = mock(PullRequestParticipant.class);
@@ -212,7 +217,7 @@ public class BuildResourceTest {
 	public void testGetJobsWithNoPR() {
 		String jobName = "jobname";
 		Job job = new Job.JobBuilder(1).jobName(jobName).triggers(new String[] { "manual" })
-				.buildParameters("param2=$PRDESTINATION").build();
+				.buildParameters("param2=$PRDESTINATION").permissions("REPO_ADMIN").build();
 		jobs.add(job);
 		Response actual = rest.getJobs(repository, "branch", "commit", null, 0);
 
